@@ -1,2 +1,5 @@
 *.env
-/databases-data
+!*example.env
+
+databases-data/
+pycache/
