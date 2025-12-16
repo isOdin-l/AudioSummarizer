@@ -21,10 +21,10 @@ class PostgresConfig(BaseSettings, Config):
     POSTGRES_PASSWORD: str
 
 class KafkaConfig(BaseSettings, Config):
-    BOOTSTRAP_SERVERS: str
-    GROUP_ID: str
-    TOPIC_CONSUME: str
-    TOPIC_PRODUCE: str
+    KAFKA_BOOTSTRAP_SERVERS: str
+    KAFKA_GROUP_ID: str
+    KAFKA_TOPIC_CONSUME: str
+    KAFKA_TOPIC_PRODUCE: str
 
 kafkaConfig = KafkaConfig()
 s3Config = S3Config()

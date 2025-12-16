@@ -7,11 +7,25 @@ services:
     volumes:
       - ./migrations/000001_init.up.sql:/docker-entrypoint-initdb.d/000001_init.up.sql
     healthcheck:
-        test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+        test: ["CMD-SHELL", "pg_isready -U postgres -d python-sum"]
         interval: 5s
         timeout: 10s
         retries: 10
         start_period: 15s
+    networks:
+      - summirizer
+
+  transcriber:
+    build: ./transcriber
+    image: transcriber-python_2year:0.1
+    container_name: transcriber-ms
+    env_file:
+      - ./transcriber/configs/postgres.env
+      - ./transcriber/configs/kafka.env
+      - ./transcriber/configs/s3.env
+    depends_on:
+      postgresDB:
+        condition: service_healthy
     networks:
       - summirizer
 
@@ -41,6 +55,7 @@ services:
     entrypoint: >
        /bin/sh -c "
        /usr/bin/mc mb data/audio-files;
+       /usr/bin/mc mb data/transcribtions;
        minio server /data --console-address ":9001";
        "
     volumes:

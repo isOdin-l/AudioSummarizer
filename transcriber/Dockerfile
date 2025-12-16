@@ -3,11 +3,11 @@
 # ============================================================
 FROM python:3.13-slim AS base
 
+
 RUN apt-get update && apt-get install -y curl build-essential && pip install "poetry" && apt-get clean && rm -rf /var/lib/apt/lists/*
 ENV PATH="/opt/poetry/bin:$PATH"
 
 WORKDIR /app
-
 
 # ============================================================
 # Stage 2 — Install dependencies
@@ -36,4 +36,4 @@ COPY --from=builder /usr/local /usr/local
 # Copy app source
 COPY . .
 
-CMD ["python", "-m", "fastapi", "run", "main.py"]
+CMD ["python", "main.py"]
