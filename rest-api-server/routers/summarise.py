@@ -24,7 +24,7 @@ async def handle_summarization(source_type: str = Form(...), interaction_data: s
     file_data = io.BytesIO(file_bytes)
     filename = uuid.uuid4()
 
-    audio_id = create_audio_file(db, filename, interaction_data)
+    audio_id = create_audio_file(db, filename, interaction_data, source_type)
 
     await s3_client.upload_file(file_data = file_data, file_length=len(file_bytes), object_name=filename, content_type=file.content_type)
 

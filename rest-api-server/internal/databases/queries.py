@@ -3,17 +3,21 @@ from sqlalchemy.exc import NoResultFound
 from .schema import AudioFile, SingleplatformAccount
 import uuid
 
-def create_audio_file(db: Session, filename: uuid, interaction_data: str) -> uuid:
+def create_audio_file(db: Session, filename: uuid, interaction_data: str, source_type: str) -> uuid:
     try:
         with db.begin():
-            account_id = db.query(SingleplatformAccount).filter(SingleplatformAccount.interaction_data == interaction_data).one().id
+            account = db.query(SingleplatformAccount).filter(SingleplatformAccount.interaction_data == interaction_data).first()
  
-            audio = AudioFile( source_id = account_id, s3_filename = str(filename), status = "pending")
+            if account is None:
+                account = SingleplatformAccount(interaction_data = interaction_data, type = source_type)
+                db.add(account)
+
+            audio = AudioFile( source_id = account.id, s3_filename = str(filename), status = "pending")
             
             db.add(audio)
         return audio.id
 
-    except NoResultFound:
-        raise ValueError(f"Account with interaction_data={interaction_data} not found")
+    except Exception as e:
+        raise NameError(f"Error: {e}")
     finally:
         db.close()
