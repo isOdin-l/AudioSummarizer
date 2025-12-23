@@ -21,11 +21,14 @@ class S3Client:
                 object_name = object_name
             )
 
-            file_data = response["Body"].read()
+            file_data = response.read()
 
             return file_data
         except S3Error as e:
             raise RuntimeError(f"Ошибка скачивания из S3: {e}")
+        finally:
+            response.close()
+            response.release_conn()
 
     async def upload_file(self, file_data: BinaryIO, file_length: int, object_name: uuid, content_type: str):
         try:

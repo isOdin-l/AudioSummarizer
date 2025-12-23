@@ -4,7 +4,7 @@
 FROM python:3.13-slim AS base
 
 
-RUN apt-get update && apt-get install -y curl build-essential && pip install "poetry" && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y curl build-essential ffmpeg && pip install "poetry" && apt-get clean && rm -rf /var/lib/apt/lists/*
 ENV PATH="/opt/poetry/bin:$PATH"
 
 WORKDIR /app
@@ -16,6 +16,7 @@ FROM base AS builder
 
 COPY pyproject.toml ./
 COPY poetry.lock ./
+COPY model/ ./model
 
 RUN poetry config virtualenvs.create false
 RUN poetry install --no-root

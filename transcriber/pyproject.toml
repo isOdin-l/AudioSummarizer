@@ -12,7 +12,8 @@ dependencies = [
     "minio (>=7.2.20,<8.0.0)",
     "sqlalchemy (>=2.0.44,<3.0.0)",
     "faster-whisper (>=1.2.1,<2.0.0)",
-    "psycopg[binary] (>=3.3.2,<4.0.0)"
+    "psycopg[binary] (>=3.3.2,<4.0.0)",
+    "modelscope (>=1.33.0,<2.0.0)",
 ]
 
 

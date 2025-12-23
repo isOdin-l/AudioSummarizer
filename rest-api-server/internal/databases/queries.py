@@ -15,4 +15,5 @@ def create_audio_file(db: Session, filename: uuid, interaction_data: str) -> uui
 
     except NoResultFound:
         raise ValueError(f"Account with interaction_data={interaction_data} not found")
-
+    finally:
+        db.close()
