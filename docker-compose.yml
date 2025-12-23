@@ -15,6 +15,20 @@ services:
     networks:
       - summirizer
 
+  transcriber:
+    build: ./transcriber
+    image: transcriber-python_2year:0.1
+    container_name: transcriber-ms
+    env_file:
+      - ./transcriber/configs/postgres.env
+      - ./transcriber/configs/kafka.env
+      - ./transcriber/configs/s3.env
+    depends_on:
+      postgresDB:
+        condition: service_healthy
+    networks:
+      - summirizer
+
   rest-api-server:
     build: ./rest-api-server
     image: rest-api-python_2year:0.1
