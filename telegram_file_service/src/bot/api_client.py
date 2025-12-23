@@ -10,7 +10,7 @@ async def send_audio_for_summarise(
     file_name: str,
     mime_type: str,
 ):
-    url = f"{api_base_url}/api/audio_summarise"
+    url = f"{api_base_url}/api/v0/audio_summarise"
     data = {
         "interaction_data": interaction_data,
         "source_type": source_type,

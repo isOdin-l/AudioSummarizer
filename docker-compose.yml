@@ -78,6 +78,30 @@ services:
       - ./databases-data/s3:/data
     networks:
       - summirizer
+      
+  tg-bot:
+    build: ./telegram_file_service
+    container_name: tg-bot
+    command: ["uvicorn", "telegram_file_service.app:app", "--host", "0.0.0.0", "--port", "8000"]
+    env_file:
+      - ./telegram_file_service/.env
+    ports:
+      - "8081:8000"
+    networks:
+      - summirizer
+
+  tg-notify:
+    build: ./notify
+    image: tg-notify:0.1
+    container_name: tg-notify
+    env_file:
+      - ./notify/configs/kafka.env
+      - ./notify/configs/s3.env
+    depends_on:
+      postgresDB:
+        condition: service_healthy
+    networks:
+      - summirizer
 
   kafka-1:
     image: apache/kafka:4.1.1

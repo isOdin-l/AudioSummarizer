@@ -16,6 +16,8 @@ if not APP_URL:
 
 WEBHOOK_URL = APP_URL.rstrip("/") + WEBHOOK_PATH
 
+print(WEBHOOK_PATH, APP_URL)
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
