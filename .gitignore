@@ -3,6 +3,7 @@
 databases-data/
 pycache/
 
+secrets/
 
 !*example.env
 

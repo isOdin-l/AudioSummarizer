@@ -2,12 +2,15 @@ services:
   postgresDB:
     image: postgres:18.1
     container_name: database
+    secrets:
+      - db_user
+      - db_name
     env_file:
       - ./configs/postgres.env
     volumes:
       - ./migrations/000001_init.up.sql:/docker-entrypoint-initdb.d/000001_init.up.sql
     healthcheck:
-        test: ["CMD-SHELL", "pg_isready -U postgres -d python-sum"]
+        test: ["CMD-SHELL", "pg_isready -U $(cat /run/secrets/db_user) -d $(cat /run/secrets/db_name"]
         interval: 5s
         timeout: 10s
         retries: 10
@@ -172,3 +175,9 @@ services:
 networks:
   summirizer:
     driver: bridge
+
+secrets:
+  db_user:
+    file: ./configs/secrets/db_user
+  db_name:
+    file: ./configs/secrets/db_name

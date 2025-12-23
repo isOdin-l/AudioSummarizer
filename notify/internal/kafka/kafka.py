@@ -4,7 +4,6 @@ from internal.s3.s3 import s3_client
 from configs.config import kafkaConfig
 import requests
 
-
 class KafkaWorker():
     def __init__(self):
         self.consumer = AIOKafkaConsumer(
@@ -27,7 +26,7 @@ class KafkaWorker():
 
                 print(sum_text)
 
-                # requests.post("http://tg-bot-service:8000/send-notification", json=json.dumps(data)) # тут отправляем реквест на сервер бота, который потом ответит польвателю
+                # requests.post("http://tg-bot-service:8081/send-notification", json=json.dumps(data)) # тут отправляем реквест на сервер бота, который потом ответит польвателю
                 await self.consumer.commit()
                 print("OK")
         except Exception as e:
