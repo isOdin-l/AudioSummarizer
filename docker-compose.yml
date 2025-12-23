@@ -7,7 +7,7 @@ services:
     volumes:
       - ./migrations/000001_init.up.sql:/docker-entrypoint-initdb.d/000001_init.up.sql
     healthcheck:
-        test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+        test: ["CMD-SHELL", "pg_isready -U postgres -d python-sum"]
         interval: 5s
         timeout: 10s
         retries: 10
@@ -30,7 +30,21 @@ services:
         condition: service_healthy
     networks:
       - summirizer
-      
+
+  summirizer:
+    build: ./summirizer
+    image: summirizer-python_2year:0.1
+    container_name: summirizer
+    env_file:
+      - ./summirizer/configs/postgres.env
+      - ./summirizer/configs/kafka.env
+      - ./summirizer/configs/s3.env
+    depends_on:
+      postgresDB:
+        condition: service_healthy
+    networks:
+      - summirizer
+
   s3:
     image: minio/minio:latest
     container_name: s3
@@ -41,6 +55,8 @@ services:
     entrypoint: >
        /bin/sh -c "
        /usr/bin/mc mb data/audio-files;
+       /usr/bin/mc mb data/transcriptions;
+       /usr/bin/mc mb data/summaries;
        minio server /data --console-address ":9001";
        "
     volumes:

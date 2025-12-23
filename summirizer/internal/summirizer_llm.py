@@ -6,10 +6,10 @@ class LLM:
     def __init__(self):
         self.model = OpenAI(
             base_url="https://openrouter.ai/api/v1",
-            api_key="<OPENROUTER_API_KEY>",
+            api_key="",
         )
-                
-        self.max_context_window = 31.000
+     
+        self.max_context_window = 160.000
 
     def split_into_sentences(self, text: str) -> List[str]:
         text = re.sub(r'(\d)\.(\d)', r'\1<NUM>\2', text)
@@ -26,22 +26,21 @@ class LLM:
 
         return [s for s in sentences if s]
     
-    def create_cunks(self, data: dict) -> List[str]: # TODO: Поменять
-        sentences = self.model.split_into_sentences(data["prompt"])
+    def create_cunks(self, data: str) -> List[str]:
+        sentences = self.split_into_sentences(data)
+        embedings = List(len(vector) for vector in self.model.embeddings.create(input=sentences, model="deepseek/deepseek-r1-0528:free"))
 
         chunks: List[str] = []
         chunks_tokens_len: List[int] = [0]
         current_chunk = str()
 
         i = 0
-        max_tokens = self.model.max_context_window*0.4
+        max_tokens = self.max_context_window*0.4
         # добавляем предложения в чанки по длине их токенизированных предложений
         while i < len(sentences):
-            sentence_tokens = self.model.craete_tokens(sentences[i]) # Токенизируем предложение 
-            
-            if len(sentence_tokens) + chunks_tokens_len[-1] <= max_tokens:
+            if embedings[i] + chunks_tokens_len[-1] <= max_tokens:
                 current_chunk += " " + sentences[i]
-                chunks_tokens_len[-1] += len(sentence_tokens)
+                chunks_tokens_len[-1] += embedings[i]
                 i+=1
             else:
                 chunks_tokens_len.append(0)
@@ -55,15 +54,27 @@ class LLM:
         print(len(chunks), chunks_tokens_len)
         return chunks
     
-    async def send_data(self, data: dict) -> dict:
+    async def send_data(self, data: dict) -> str:
 
-        completion = self.chat.completions.create(
-            model="qwen/qwen3-235b-a22b:free",
+        completion = self.model.chat.completions.create(
+            model="deepseek/deepseek-r1-0528:free",
             messages=[
                 {
                 "role": "user",
-                "content": data
+                "content": f"я тебе передам текст, а ты должен его суммаризировать, cохрани стилистический окрас текста в суммаризации. Вот текст: {data}"
                 }
             ]
         )
+
         print(completion.choices[0].message.content)
+        return completion.choices[0].message.content
+    async def summirize(self, data: str) -> str: # data - текст из транскрибатора
+        chunks = self.create_cunks(data=data)
+        
+        summarization = str()
+        for i in range(len(chunks)):
+            summarization += self.send_data(data=chunks[i])
+        
+        return summarization
+
+SummirizerLLM = LLM()
