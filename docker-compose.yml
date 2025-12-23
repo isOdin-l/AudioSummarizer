@@ -44,7 +44,21 @@ services:
         condition: service_healthy
     networks:
       - summirizer
-      
+
+  summirizer:
+    build: ./summirizer
+    image: summirizer-python_2year:0.1
+    container_name: summirizer
+    env_file:
+      - ./summirizer/configs/postgres.env
+      - ./summirizer/configs/kafka.env
+      - ./summirizer/configs/s3.env
+    depends_on:
+      postgresDB:
+        condition: service_healthy
+    networks:
+      - summirizer
+
   s3:
     image: minio/minio:latest
     container_name: s3
@@ -55,7 +69,8 @@ services:
     entrypoint: >
        /bin/sh -c "
        /usr/bin/mc mb data/audio-files;
-       /usr/bin/mc mb data/transcribtions;
+       /usr/bin/mc mb data/transcriptions;
+       /usr/bin/mc mb data/summaries;
        minio server /data --console-address ":9001";
        "
     volumes:
