@@ -51,10 +51,11 @@ class KafkaWorker():
                 text_file.seek(0)
                 await s3_client.upload_file(file_data = text_file, object_name = tr_name, file_length = len(binary_text), content_type="txt/plain")
 
-                await self.send({"s3_filename": str(tr_name), "interaction_data": data["interaction_data"]})
+                await self.send({"s3_filename": str(tr_name), "interaction_data": data["interaction_data"], "audio_id": data["audio_id"]})
                 
                 # Явное подтверждение оффсета
                 await self.consumer.commit()
+                print("OK")
         
         except Exception as e:
             print(f"Ошибка: {e}")

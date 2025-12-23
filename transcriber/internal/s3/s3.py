@@ -20,7 +20,7 @@ class S3Client:
                 bucket_name = s3Config.S3_BUCKET_CONSUMER, 
                 object_name = object_name
             )
-
+            
             file_data = response.read()
 
             return file_data

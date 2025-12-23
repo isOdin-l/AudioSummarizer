@@ -37,7 +37,10 @@ class KafkaWorker():
                 data = json.loads(msg.value)
                 
                 audio_data = await s3_client.download_file(object_name = data["s3_filename"])
-                result_text = await SummirizerLLM.summirize(audio_data)
+                audio_text = audio_data.decode("utf-8")
+                
+                
+                result_text = await SummirizerLLM.summirize(audio_text)
                 
                 summary_name = uuid.uuid4()
                 with get_db() as db:
@@ -48,10 +51,9 @@ class KafkaWorker():
                 text_file = io.BytesIO(binary_text)
                 text_file.seek(0)
                 await s3_client.upload_file(file_data = text_file, object_name = summary_name, file_length = len(binary_text), content_type="txt/plain")
-                
+
                 # Отправка в целевой топик 
-                await self.send({"s3_filename": summary_name, "interaction_data": data["interaction_data"]})
-                
+                await self.send({"s3_filename": str(summary_name), "interaction_data": data["interaction_data"], "audio_id": data["audio_id"]})
                 # Явное подтверждение оффсета
                 await self.consumer.commit()
                 print("OK")

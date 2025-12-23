@@ -50,6 +50,7 @@ services:
     image: summirizer-python_2year:0.1
     container_name: summirizer
     env_file:
+      - ./summirizer/configs/model.env
       - ./summirizer/configs/postgres.env
       - ./summirizer/configs/kafka.env
       - ./summirizer/configs/s3.env

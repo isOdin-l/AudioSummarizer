@@ -1,12 +1,13 @@
 from typing import List
 from openai import OpenAI
 import re
+import os
 
 class LLM:
     def __init__(self):
         self.model = OpenAI(
             base_url="https://openrouter.ai/api/v1",
-            api_key="",
+            api_key=os.getenv("API_KEY"),
         )
      
         self.max_context_window = 160.000
@@ -25,10 +26,11 @@ class LLM:
         ]
 
         return [s for s in sentences if s]
-    
+
     def create_cunks(self, data: str) -> List[str]:
         sentences = self.split_into_sentences(data)
-        embedings = List(len(vector) for vector in self.model.embeddings.create(input=sentences, model="deepseek/deepseek-r1-0528:free"))
+        embedings = self.create_embedings(sentences)
+        # embedings = List(len(vector) for vector in self.model.embeddings.create(input=sentences, model="text-embedding-ada-002"))
 
         chunks: List[str] = []
         chunks_tokens_len: List[int] = [0]
@@ -50,14 +52,11 @@ class LLM:
         if current_chunk != "":
             chunks.append(current_chunk)
             # chunks_tokens_len[-1] = len(self.model.craete_tokens(current_chunk))
-
-        print(len(chunks), chunks_tokens_len)
         return chunks
     
-    async def send_data(self, data: dict) -> str:
-
+    async def send_data(self, data: str) -> str:
         completion = self.model.chat.completions.create(
-            model="deepseek/deepseek-r1-0528:free",
+            model="google/gemma-3-27b-it:free",
             messages=[
                 {
                 "role": "user",
@@ -66,15 +65,12 @@ class LLM:
             ]
         )
 
-        print(completion.choices[0].message.content)
         return completion.choices[0].message.content
     async def summirize(self, data: str) -> str: # data - текст из транскрибатора
-        chunks = self.create_cunks(data=data)
-        
-        summarization = str()
-        for i in range(len(chunks)):
-            summarization += self.send_data(data=chunks[i])
-        
+        # chunks = self.create_cunks(data=data)
+        # summarization = str()
+        # for i in range(len(chunks)):
+        summarization = await self.send_data(data=data)
         return summarization
 
 SummirizerLLM = LLM()
