@@ -1,5 +1,8 @@
 *.env
-!*example.env
-
+*.nix
 databases-data/
 pycache/
+
+
+!*example.env
+
