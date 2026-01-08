@@ -3,7 +3,11 @@ name = "telegram-file-service"
 version = "0.1.0"
 description = "Telegram bot + notify worker (webhooks) for audio summarise pipeline"
 authors = ["Anton"]
-packages = [{ include = "telegram_file_service", from = "src" }]
+packages = [
+  { include = "telegram_file_service", from = "src" },
+  { include = "bot", from = "src" }
+]
+
 
 [tool.poetry.dependencies]
 python = "^3.12"
@@ -16,8 +20,7 @@ aiokafka = "^0.10"
 boto3 = "^1.34"
 
 [tool.poetry.scripts]
-tg-bot = "telegram_file_service.app:run"  
-notify = "telegram_file_service.notify.worker:run"
+tg-bot = "telegram_file_service.polling:main"
 
 [build-system]
 requires = ["poetry-core"]

@@ -29,7 +29,7 @@ class MultiplatformAccount(Base):
 class SingleplatformAccount(Base):
     __tablename__ = "singleplatform_accounts"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(as_uuid=True), primary_key=True)
     user_id = Column(UUID(as_uuid=True), ForeignKey("multiplatform_accounts.id", ondelete="SET NULL"), nullable=True)
     interaction_data = Column(Text, unique=True, nullable=False)
     type = Column(String(32), nullable=False)
@@ -45,7 +45,7 @@ class AudioFile(Base):
     __tablename__ = "audio_files"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("multiplatform_accounts.id", ondelete="CASCADE"))
+    user_id = Column(UUID(as_uuid=True), ForeignKey("multiplatform_accounts.id", ondelete="CASCADE"), nullable=True)
     source_id = Column(UUID(as_uuid=True), ForeignKey("singleplatform_accounts.id", ondelete="CASCADE"))
     s3_filename = Column(Text, nullable=False)
     status = Column(String, nullable=False)

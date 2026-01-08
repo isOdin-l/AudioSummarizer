@@ -29,7 +29,6 @@ class LLM:
 
     def create_cunks(self, data: str) -> List[str]:
         sentences = self.split_into_sentences(data)
-        embedings = self.create_embedings(sentences)
         # embedings = List(len(vector) for vector in self.model.embeddings.create(input=sentences, model="text-embedding-ada-002"))
 
         chunks: List[str] = []
@@ -40,9 +39,9 @@ class LLM:
         max_tokens = self.max_context_window*0.4
         # добавляем предложения в чанки по длине их токенизированных предложений
         while i < len(sentences):
-            if embedings[i] + chunks_tokens_len[-1] <= max_tokens:
+            if len(sentences[i]) + chunks_tokens_len[-1] <= max_tokens:
                 current_chunk += " " + sentences[i]
-                chunks_tokens_len[-1] += embedings[i]
+                chunks_tokens_len[-1] += len(sentences[i])
                 i+=1
             else:
                 chunks_tokens_len.append(0)
@@ -56,7 +55,7 @@ class LLM:
     
     async def send_data(self, data: str) -> str:
         completion = self.model.chat.completions.create(
-            model="google/gemma-3-27b-it:free",
+            model="deepseek/deepseek-v3.2",
             messages=[
                 {
                 "role": "user",

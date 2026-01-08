@@ -8,7 +8,7 @@ CREATE TABLE multiplatform_accounts (
 );
 
 CREATE TABLE singleplatform_accounts (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id UUID PRIMARY KEY,
     user_id UUID REFERENCES multiplatform_accounts(id) ON DELETE SET NULL,
     interaction_data TEXT NOT NULL UNIQUE,
     type VARCHAR(32) NOT NULL,

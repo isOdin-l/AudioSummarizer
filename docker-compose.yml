@@ -10,7 +10,7 @@ services:
     volumes:
       - ./migrations/000001_init.up.sql:/docker-entrypoint-initdb.d/000001_init.up.sql
     healthcheck:
-        test: ["CMD-SHELL", "pg_isready -U $(cat /run/secrets/db_user) -d $(cat /run/secrets/db_name"]
+        test: ["CMD-SHELL", "pg_isready -U $(cat /run/secrets/db_user) -d $(cat /run/secrets/db_name)"]
         interval: 5s
         timeout: 10s
         retries: 10
@@ -84,12 +84,22 @@ services:
       
   tg-bot:
     build: ./telegram_file_service
+    image: tg-bot:0.1
     container_name: tg-bot
-    command: ["uvicorn", "telegram_file_service.app:app", "--host", "0.0.0.0", "--port", "8000"]
+    command: ["python", "-m", "telegram_file_service.polling"] 
     env_file:
       - ./telegram_file_service/.env
+    environment:
+      API_BASE_URL: http://rest-api-server:8000
+      AUDIO_SUMMARISE_PATH: /api/v0/audio_summarise
+      WEBHOOK_PATH: /webhook
     ports:
       - "8081:8000"
+    depends_on:
+      rest-api-server:
+        condition: service_started
+      kafka-init:
+        condition: service_started
     networks:
       - summirizer
 
